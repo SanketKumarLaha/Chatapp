@@ -34,13 +34,16 @@ const Signup = () => {
     const body = { username, email, password, imageUrl: imageJson };
 
     //send a post req of signup
-    const response = await fetch(process.env.REACT_APP_BACKEND_URL + "api/user/signup", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      process.env.REACT_APP_BACKEND_URL + "api/user/signup",
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const json = await response.json();
 
     //dispatch a action in the context
@@ -58,14 +61,14 @@ const Signup = () => {
   if (user) return <Navigate to="/" replace={true} />;
   return (
     <div className="w-screen h-screen bg-primary-color text-third-color flex justify-center items-center font-poppins">
-      <div className="max-w-max p-5 bg-slate-800 rounded-2xl flex flex-col justify-center items-center">
+      <div className="w-3/5 sm:max-w-[25rem] p-5 bg-slate-800 rounded-2xl flex flex-col justify-center items-center">
         <div className="mb-5 flex flex-col items-center">
           <h1 className="text-3xl font-bold">Welcome</h1>
           <p className="text-sm font-medium">Please enter your details</p>
         </div>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col py-2 m-2 justify-between w-5/6 text-primary-color"
+          className="flex flex-col md:p-5 m-2 justify-between w-full text-primary-color"
         >
           <div className="flex flex-col mb-3">
             <input
