@@ -10,9 +10,11 @@ require("dotenv").config();
 const app = express();
 const server = http.createServer(app);
 
+const PORT = process.env.PORT || 4000;
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000"],
   },
 });
 
@@ -49,7 +51,7 @@ io.on("connection", (socket) => {
 });
 
 mongoose.connect(process.env.MONGODB_URI).then(() => {
-  server.listen(4000, () => {
-    console.log("Serven listening on port", 4000);
+  server.listen(PORT, () => {
+    console.log("Serven listening on port", PORT);
   });
 });

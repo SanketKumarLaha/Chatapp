@@ -16,13 +16,16 @@ const Login = () => {
     const body = { email, password };
 
     //send a post req of login
-    const response = await fetch("http://localhost:4000/api/user/login", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      process.env.REACT_APP_BACKEND_URL + "/api/user/login",
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const json = await response.json();
 
     //dispatch a action in the context

@@ -20,7 +20,7 @@ const Signup = () => {
       formdata.append("imageUrl", imageUrl);
 
       const imageResponse = await fetch(
-        "http://localhost:4000/api/user/upload",
+        process.env.REACT_APP_BACKEND_URL + "api/user/upload",
         {
           method: "POST",
           body: formdata,
@@ -34,7 +34,7 @@ const Signup = () => {
     const body = { username, email, password, imageUrl: imageJson };
 
     //send a post req of signup
-    const response = await fetch("http://localhost:4000/api/user/signup", {
+    const response = await fetch(process.env.REACT_APP_BACKEND_URL + "api/user/signup", {
       method: "POST",
       body: JSON.stringify(body),
       headers: {

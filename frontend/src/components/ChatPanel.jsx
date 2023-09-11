@@ -5,7 +5,7 @@ import { useClickedUserContext } from "../hooks/useClickedUserContext";
 import { useUsersContext } from "../hooks/useUsersContext";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:4000");
+const socket = io(process.env.REACT_APP_BACKEND_URL);
 
 const ChatPanel = () => {
   const { user } = useAuthContext();
@@ -44,7 +44,7 @@ const ChatPanel = () => {
     const callMessagesApi = async () => {
       //? getting all the messages of the current user
       const response = await fetch(
-        "http://localhost:4000/api/user/getUserMessages",
+        process.env.REACT_APP_BACKEND_URL + "/api/user/getUserMessages",
         {
           method: "POST",
           body: JSON.stringify({ id: userId }),

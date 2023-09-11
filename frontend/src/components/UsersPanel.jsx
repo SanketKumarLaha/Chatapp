@@ -35,7 +35,9 @@ const UsersPanel = () => {
   useEffect(() => {
     const fetchAllUsers = async () => {
       //? fetching all users
-      const response = await fetch("http://localhost:4000/api/user/allusers");
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_URL + "/api/user/allusers"
+      );
       const json = await response.json();
 
       //? getting all the users in the db except the current user
