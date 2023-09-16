@@ -58,7 +58,6 @@ UserSchema.statics.signup = async function (
     password: hash,
     imageUrl,
   });
-  console.log("new user", newUser);
   return newUser;
 };
 

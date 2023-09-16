@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useClickedUserContext } from "../hooks/useClickedUserContext";
 import { useUsersContext } from "../hooks/useUsersContext";
+import { format } from "date-fns";
 import { io } from "socket.io-client";
 
 const socket = io(process.env.REACT_APP_BACKEND_URL);
@@ -33,13 +34,12 @@ const ChatPanel = () => {
     });
   }, [showChatMessages]);
 
-  //? when clicked back setting the clickedUser context state to empty
+  // when clicked back setting the clickedUser context state to empty
   const goBack = () => {
     setClickedUser({});
   };
 
-  // 👍
-  //? getting all the messages of the user
+  // getting all the messages of the user
   useEffect(() => {
     const callMessagesApi = async () => {
       //? getting all the messages of the current user
@@ -59,8 +59,8 @@ const ChatPanel = () => {
     if (user) callMessagesApi();
   }, [user, userId, clickedUserId]);
 
-  //? CHAT MESSAGES
-  //? getting all the messages of the clickeduser that is clicked in the user's userspanel
+  // CHAT MESSAGES
+  // getting all the messages of the clickeduser that is clicked in the user's userspanel
   useEffect(() => {
     const existingClickedUserMessages = allMessages.filter(
       (item) =>
@@ -69,7 +69,7 @@ const ChatPanel = () => {
     setChatMessages(existingClickedUserMessages);
   }, [clickedUserId, allMessages]);
 
-  //? filtering the Chat messages that recently came through socket
+  // filtering the Chat messages that recently came through socket
   useEffect(() => {
     const newFilteredChatMessages = chatMessages.filter(
       (item) =>
@@ -78,8 +78,8 @@ const ChatPanel = () => {
     setShowChatMessages(newFilteredChatMessages);
   }, [clickedUserId, chatMessages]);
 
-  //? USERS
-  //? getting the ids of all the otherUsers that sent or received messages
+  // USERS
+  // getting the ids of all the otherUsers that sent or received messages
   useEffect(() => {
     let currentUserContacts = [];
     for (let messageObj of allMessages) {
@@ -90,7 +90,7 @@ const ChatPanel = () => {
         currentUserContacts.push(messageObj.userId);
       }
     }
-    //? filtered the otherUsers so that they only appear once in the array
+    // filtered the otherUsers so that they only appear once in the array
     currentUserContacts = [...new Set(currentUserContacts)];
     setUsers(currentUserContacts);
     setTempUsers(currentUserContacts);
@@ -101,23 +101,26 @@ const ChatPanel = () => {
     setUsers(currentUserContacts);
   }, [tempUsers, setUsers]);
 
-  //? SOCKET OPERATIONS
-  //? setting userIds to all the users that signed up
+  // SOCKET OPERATIONS
+  // setting userIds to all the users that signed up
   useEffect(() => {
     if (user) {
       socket.emit("setUserId", userId);
     }
   }, [user, userId]);
 
-  //? receiving meesages from other users and setting the messages to a state chatMessages
+  // receiving meesages from other users and setting the messages to a state chatMessages
   useEffect(() => {
     socket.on("receivedMessage", ({ message, clickedUserId, userId }) => {
-      setChatMessages((prev) => [...prev, { message, clickedUserId, userId }]);
+      setChatMessages((prev) => [
+        ...prev,
+        { message, clickedUserId, userId, time: new Date() },
+      ]);
       setTempUsers((prev) => [...prev, userId]);
     });
   }, []);
 
-  //? when sent messages sending a event sendingMessage to the receiver
+  // when sent messages sending a event sendingMessage to the receiver
   const handleClick = (e) => {
     e.preventDefault();
     socket.emit("sendingMessage", {
@@ -126,17 +129,18 @@ const ChatPanel = () => {
       userId,
     });
 
-    //? showing the message  to the sender's ui
+    // showing the message  to the sender's ui
     setChatMessages((prev) => [
       ...prev,
       {
         message,
         clickedUserId,
         userId,
+        time: new Date(),
       },
     ]);
 
-    //? when message is sent the users context state gets updated with the one to whom the message is sent
+    // when message is sent the users context state gets updated with the one to whom the message is sent
     const clickedUserExists = users.some((item) => item === clickedUserId);
     if (!clickedUserExists) {
       setUsers((prev) => [...prev, clickedUserId]);
@@ -159,7 +163,7 @@ const ChatPanel = () => {
     >
       <div className="flex justify-between items-center p-3 h-14 bg-primary-color border-b border-secondary-color box-border">
         <div className="flex items-center">
-          <div onClick={goBack} className="cursor-pointer">
+          <div onClick={goBack} className="cursor-pointer mr-2">
             <ArrowLeft />
           </div>
           <div
@@ -179,9 +183,11 @@ const ChatPanel = () => {
         <div>{/* <MoreVertical /> */}</div>
       </div>
 
-      <div className="w-full h-[calc(100%-8.5rem)] relative flex flex-col overflow-y-auto ">
+      <div className="w-full h-[calc(100%-8.5rem)] relative flex flex-col overflow-y-auto  overflow-x-hidden">
         {showChatMessages &&
           showChatMessages.map((item, index) => {
+            const date = new Date(item.createdAt || item.time);
+            const formattedTime = format(date, "h:mmaaa");
             return (
               <div
                 key={index}
@@ -190,21 +196,34 @@ const ChatPanel = () => {
                 }`}
               >
                 <div
-                  className={`m-1 inline-block max-w-[50%] rounded ${
+                  className={`m-1 max-w-[70%] rounded-lg flex justify-between ${
                     item.userId === user?.newUser?._id
-                      ? "bg-sky-300"
-                      : "bg-secondary-color"
+                      ? "bg-gradient-to-r from-blue-400 to-blue-300"
+                      : "bg-gradient-to-r from-slate-600 to-slate-500"
                   }`}
                 >
-                  <h1
-                    className={`text-lg px-3 ${
-                      item.userId === user?.newUser?._id
-                        ? "text-black"
-                        : "text-third-color"
-                    }`}
-                  >
-                    {item.message}
-                  </h1>
+                  <div className="p-1 whitespace-pre-wrap break-words">
+                    <h1
+                      className={`text-lg px-3 ${
+                        item.userId === user?.newUser?._id
+                          ? "text-black"
+                          : "text-third-color"
+                      }`}
+                    >
+                      {item.message}
+                    </h1>
+                  </div>
+                  <div className="flex flex-col justify-end">
+                    <h1
+                      className={`p-1 text-xs ${
+                        item.userId === user?.newUser?._id
+                          ? "text-black"
+                          : "text-third-color"
+                      }`}
+                    >
+                      {formattedTime}
+                    </h1>
+                  </div>
                 </div>
               </div>
             );
@@ -216,9 +235,9 @@ const ChatPanel = () => {
         <form
           action=""
           onSubmit={handleClick}
-          className=" h-20 bg-primary-color flex justify-around items-center"
+          className=" h-20 p-1 bg-primary-color flex justify-around items-center"
         >
-          <div className="w-10/12 h-2/3 px-10 flex items-center rounded-full bg-slate-800">
+          <div className="w-10/12 h-2/3 mr-5 px-10 flex items-center rounded-full bg-slate-800">
             <input
               type="text"
               value={message}
@@ -227,9 +246,9 @@ const ChatPanel = () => {
               className="w-full outline-none bg-slate-800"
             />
           </div>
-          <div className="w-1/12 flex justify-center items-start">
+          <div className=" flex justify-center items-start">
             <button className="flex justify-around items-center rounded-full cursor-pointer  w-full p-2 bg-gradient-to-r from-blue-300 to-yellow-300">
-              <h1 className="text-sm font-semibold text-black">Send</h1>
+              <h1 className="text-sm font-semibold text-black mr-1">Send</h1>
               <SendHorizonal size={26} strokeWidth={2} className="text-black" />
             </button>
           </div>

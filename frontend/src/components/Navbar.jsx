@@ -24,7 +24,7 @@ const Navbar = () => {
     <div className="w-full h-16 flex justify-between items-center p-1 px-3 bg-primary-color border-b border-secondary-color box-border">
       <div className="flex items-center w-48">
         <h1 className="font-sans text-3xl font-semibold text-third-color">
-          Meows
+          KittyTalk
         </h1>
         <div className="text-third-color ml-2">
           <PawPrint />
@@ -63,8 +63,8 @@ const Navbar = () => {
             >
               <X />
             </h1>
-            <h1 className="font-semibold text-lg">Sanket</h1>
-            <h1 className="font-light text-base">sanketkumarlaha@gmail.com</h1>
+            <h1 className="font-semibold text-lg">{user?.newUser?.username}</h1>
+            <h1 className="font-light text-base">{user?.newUser?.email}</h1>
             <div className="flex justify-center pt-2">
               <button className="bg-red-500 p-2 rounded">Logout</button>
             </div>

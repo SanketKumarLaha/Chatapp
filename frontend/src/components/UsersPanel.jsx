@@ -17,7 +17,7 @@ const UsersPanel = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [filteredOtherUsers, setFilteredOtherUsers] = useState([]);
 
-  //? searching when typed and finding all users
+  // searching when typed and finding all users
   useEffect(() => {
     if (searchUser !== "") {
       setShowUsers(
@@ -34,22 +34,22 @@ const UsersPanel = () => {
 
   useEffect(() => {
     const fetchAllUsers = async () => {
-      //? fetching all users
+      // fetching all users
       const response = await fetch(
         process.env.REACT_APP_BACKEND_URL + "/api/user/allusers"
       );
       const json = await response.json();
 
-      //? getting all the users in the db except the current user
+      // getting all the users in the db except the current user
       const filteredAllUsers = json.filter(
         (item) => item._id !== user.newUser._id
       );
       setAllUsers(filteredAllUsers);
 
-      //? getting all info about the users contacts who are messaging each other
+      // getting all info about the users contacts who are messaging each other
       const otherUsers = [];
-      users.forEach((user) => {
-        const otherUser = json.find((item) => item._id === user);
+      users.forEach((userItem) => {
+        const otherUser = json.find((item) => item._id === userItem);
         if (otherUser) {
           otherUsers.push(otherUser);
         }
@@ -57,11 +57,11 @@ const UsersPanel = () => {
       setFilteredOtherUsers(otherUsers);
       setShowUsers(otherUsers);
     };
-    fetchAllUsers();
+    if (user) fetchAllUsers();
   }, [users, user]);
 
   const handleAllUsers = async () => {
-    //? setting all the users other than the current user when clicked to all contacts
+    // setting all the users other than the current user when clicked to all contacts
     setShowUsers(allUsers);
   };
 

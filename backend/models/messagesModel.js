@@ -16,11 +16,9 @@ const MessagesSchema = new mongoose.Schema(
 );
 
 MessagesSchema.statics.getUserMessages = async function (id) {
-  console.log("MessagesSchema id", id);
   const messages = await this.find({
     $or: [{ clickedUserId: id }, { userId: id }],
   });
-  console.log("messages", messages);
   return messages;
 };
 
