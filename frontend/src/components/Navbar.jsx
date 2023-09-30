@@ -1,30 +1,29 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { MoreVertical, PawPrint, X } from "lucide-react";
+import Profile from "./Profile";
+import { useOpenSettingsContext } from "../hooks/useOpenSettingsModalContext";
+import { useOpenProfileContext } from "../hooks/useOpenProfileContext";
 
 const Navbar = () => {
   const { user, dispatch } = useAuthContext();
-
-  const modalRef = useRef(null);
-
-  const handleClick = () => {
-    modalRef.current.showModal();
-  };
-
-  const handleCancel = () => {
-    modalRef.current.close();
-  };
+  const { modalRef, handleClick, handleCancel } = useOpenSettingsContext();
+  const { openProfile, setOpenProfile } = useOpenProfileContext();
 
   const handleLogout = () => {
     dispatch({ type: "LOGOUT" });
     localStorage.removeItem("user");
   };
 
+  const handleProfile = () => {
+    setOpenProfile(true);
+  };
+
   return (
-    <div className="w-full h-16 flex justify-between items-center p-1 px-3 bg-primary-color border-b border-secondary-color box-border">
+    <div className="w-full h-16 flex justify-between items-center px-4 bg-primary-color border-b border-secondary-color box-border">
       <div className="flex items-center w-48">
-        <h1 className="font-sans text-3xl font-semibold text-third-color">
-          KittyTalk
+        <h1 className="font-sans text-3xl font-semibold text-third-color tracking-wider">
+          CatComms
         </h1>
         <div className="text-third-color ml-2">
           <PawPrint />
@@ -54,21 +53,31 @@ const Navbar = () => {
         </div>
         <dialog
           ref={modalRef}
-          className="p-5 absolute top-0 right-0 backdrop:bg-black backdrop:opacity-60 rounded"
+          className="min-w-[300px] p-8 bg-slate-300 absolute top-0 right-0 backdrop:bg-black backdrop:opacity-60 rounded"
         >
-          <form action="" onSubmit={handleLogout} className="">
-            <h1
-              onClick={handleCancel}
-              className="cursor-pointer absolute top-1 right-1 bg-green-400 rounded"
-            >
-              <X />
-            </h1>
-            <h1 className="font-semibold text-lg">{user?.newUser?.username}</h1>
-            <h1 className="font-light text-base">{user?.newUser?.email}</h1>
-            <div className="flex justify-center pt-2">
-              <button className="bg-red-500 p-2 rounded">Logout</button>
-            </div>
-          </form>
+          {openProfile ? (
+            <Profile />
+          ) : (
+            <form action="" onSubmit={handleLogout} className="">
+              <h1
+                onClick={handleCancel}
+                className="cursor-pointer absolute top-1 right-1 rounded"
+              >
+                <X />
+              </h1>
+              <div
+                onClick={handleProfile}
+                className="w-full mt-5 p-2 rounded text-white bg-black flex items-center justify-center cursor-pointer"
+              >
+                Profile
+              </div>
+              <div className="w-full pt-2">
+                <button type="submit" className="bg-red-500 p-2 rounded w-full">
+                  Logout
+                </button>
+              </div>
+            </form>
+          )}
         </dialog>
       </div>
     </div>

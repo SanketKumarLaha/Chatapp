@@ -9,21 +9,17 @@ const createToken = (_id) => {
 
 const signup = async (req, res) => {
   const { username, email, password, imageUrl } = req.body;
-  console.log("imageUrl", imageUrl);
   try {
     let imageResult = "";
     if (imageUrl) {
-      imageResult = await cloudinary.v2.uploader.upload(
-        imageUrl,
-        (error, result) => console.log(result)
-      );
+      imageResult = await cloudinary.v2.uploader.upload(imageUrl);
     }
     console.log("imageResult", imageResult);
     const newUser = await User.signup(
       username,
       email,
       password,
-      imageResult === "" ? "" : imageResult.secure_url
+      imageResult.secure_url
     );
     const token = createToken(newUser._id);
     res.status(200).json({ newUser, token });
@@ -63,4 +59,22 @@ const getUserMessages = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, allusers, getUserMessages };
+const updateUserInfo = async (req, res) => {
+  const { id } = req.query;
+  const { username, email, imageUrl } = req.body;
+
+  console.log(id);
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { username, email, imageUrl },
+      { new: true, timestamps: true }
+    );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400), json({ error: error.message });
+  }
+};
+
+module.exports = { signup, login, allusers, getUserMessages, updateUserInfo };

@@ -10,30 +10,23 @@ const Signup = () => {
 
   const [error, setError] = useState("");
 
-  const { dispatch } = useAuthContext();
+  const { user, dispatch } = useAuthContext();
+
+  const handleImageChange = (e) => {
+    const reader = new FileReader();
+    const file = e.target.files[0];
+
+    reader.onloadend = () => {
+      setImageUrl(reader.result);
+    };
+
+    if (file) reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let imageJson = "";
-    if (imageUrl) {
-      const formdata = new FormData();
-      formdata.append("imageUrl", imageUrl);
-
-      const imageResponse = await fetch(
-        process.env.REACT_APP_BACKEND_URL + "/api/user/upload",
-        {
-          method: "POST",
-          body: formdata,
-        }
-      );
-
-      imageJson = await imageResponse.json();
-    }
-
-    console.log({ imageJson });
-    const body = { username, email, password, imageUrl: imageJson };
-
+    const body = { username, email, password, imageUrl };
     // send a post req of signup
     const response = await fetch(
       process.env.REACT_APP_BACKEND_URL + "/api/user/signup",
@@ -59,14 +52,11 @@ const Signup = () => {
     }
   };
 
-  const { user } = useAuthContext();
-
   if (user) return <Navigate to="/" replace={true} />;
-
   return (
     <div className="w-screen h-screen bg-primary-color text-third-color flex justify-center items-center font-poppins">
       <div className="w-3/5 sm:max-w-[25rem] p-5 bg-slate-800 rounded-2xl flex flex-col justify-center items-center">
-        <div className="mb-5 flex flex-col items-center">
+        <div className="flex flex-col items-center">
           <h1 className="text-3xl font-bold">Welcome</h1>
           <p className="text-sm font-medium">Please enter your details</p>
         </div>
@@ -74,6 +64,31 @@ const Signup = () => {
           onSubmit={handleSubmit}
           className="flex flex-col md:p-5 m-2 justify-between w-full text-primary-color"
         >
+          <div className="flex flex-col justify-center items-center">
+            <img
+              src={
+                imageUrl ||
+                "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
+              }
+              alt=""
+              className="w-[100px] h-[100px] mb-2 object-cover object-top rounded-full"
+            />
+            <label
+              htmlFor="imageInput"
+              className="w-full flex justify-center items-center mb-5"
+            >
+              <div className="w-2/3 p-2 rounded-full text-white bg-black flex items-center justify-center text-sm cursor-pointer">
+                Change picture
+              </div>
+            </label>
+            <input
+              id="imageInput"
+              name="imageInput"
+              type="file"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
           <div className="flex flex-col mb-3">
             <input
               type="text"
@@ -90,7 +105,7 @@ const Signup = () => {
           </div>
           <div className="flex flex-col mb-3">
             <input
-              type="text"
+              type="email"
               id="email"
               value={email}
               placeholder="Enter your email"
@@ -116,16 +131,11 @@ const Signup = () => {
               className="rounded-2xl h-7 p-2 px-5 text-sm shadow-md outline-none"
             />
           </div>
-          <div className="flex rounded-2xl bg-green-400">
-            <input
-              type="file"
-              name="imageUrl"
-              id="imageUrl"
-              onChange={(e) => setImageUrl(e.target.files[0])}
-              className="rounded-2xl text-sm shadow-md outline-none text-white"
-            />
-          </div>
-          <button className="bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-2xl p-2 mt-4 text-sm ">
+
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-2xl p-2 mt-4 text-sm "
+          >
             Sign up
           </button>
           {error && (
