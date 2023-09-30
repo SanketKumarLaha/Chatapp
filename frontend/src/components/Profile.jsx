@@ -90,7 +90,7 @@ const Profile = () => {
               "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png"
             }
             alt=""
-            className="w-[100px] h-[100px] mb-2 object-cover object-top rounded-full cursor-pointer"
+            className="w-[100px] h-[100px] mb-2 object-cover object-center rounded-full cursor-pointer"
           />
         </label>
         <input
